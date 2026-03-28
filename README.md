@@ -1,2 +1,3 @@
 # graduation
-better discord bot with image detection 
+better discord bot calculating carbon emissions on the road
+
