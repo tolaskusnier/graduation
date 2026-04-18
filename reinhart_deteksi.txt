@@ -1,0 +1,29 @@
+#Computer Vision Deteksi objek
+@bot.command()
+async def deteksi(ctx):
+    if ctx.message.attachments:
+        for attachment in ctx.message.attachments:
+            file_name = attachment.filename
+            await attachment.save(f"./CV/{file_name}")
+            # call detect ONCE and reuse its result
+            results = detect(input_image=f"./CV/{file_name}", output_image=f"./CV/{file_name}", model_path="yolov3.pt")
+            
+            # If detect returns a list of detections, count them
+            if isinstance(results, list):
+                counts = Counter(d['name'] for d in results)
+                msg = '\n'.join(f"{k}: {v}" for k, v in counts.items())
+                temp = ""
+                total = sum(counts.values())  # <-- total count
+                if total > 20:
+                    temp += "crowded"
+                elif total > 30:
+                    temp += "crowded and bad for health"
+                else:
+                    temp += "normal"
+                with open(f'CV/{file_name}', 'rb') as f:
+                    picture = discord.File(f'CV/{file_name}')
+                await ctx.send(file=picture)
+                await ctx.send(f"Warning: {temp}")
+                await ctx.send(f"Object counts:\n{msg}")
+    else:
+        await ctx.send("Anda lupa mengunggah gambar :(")
